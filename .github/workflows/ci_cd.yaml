@@ -1,0 +1,84 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - trunk
+      - 'deploy/**'
+
+jobs:
+    prepare:
+        timeout-minutes: 1
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Decide environment to deploy to
+              id: decide
+              run: |
+                BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+                if [[ "$BRANCH_NAME" == "trunk" ]]; then
+                  echo "DEPLOY_ENV=test" >> $GITHUB_OUTPUT
+                elif [[ "${BRANCH_NAME}" == "deploy/uat" ]]; then
+                  echo "DEPLOY_ENV=uat" >> $GITHUB_OUTPUT
+                elif [[ "${BRANCH_NAME}" == "deploy/prod" ]]; then
+                  echo "DEPLOY_ENV=prod" >> $GITHUB_OUTPUT
+                else
+                  echo "Should not be run on this branch"
+                  exit 1
+                fi
+      
+        outputs:
+            deploy-env: ${{ steps.decide.outputs.DEPLOY_ENV }}
+
+
+### DEPLOY ###
+    deploy:
+        needs: 
+            - prepare
+        runs-on: ubuntu-latest
+
+        environment: ${{ needs.prepare.outputs.deploy-env }} 
+
+        steps:
+            - uses: actions/checkout@v3
+        
+            - uses: actions/setup-node@v3
+              with:
+                node-version: '18'
+                cache: npm
+
+            - name: Configure GitHub Packages
+              shell: bash
+              run: |
+                npm config set //npm.pkg.github.com/:_authToken ${{ github.token }}
+                npm config set registry https://registry.npmjs.org
+                npm config set "@magicmemories:registry" https://npm.pkg.github.com
+
+            - name: Configure aws credentials
+              uses: aws-actions/configure-aws-credentials@v2
+              with:
+                aws-access-key-id: ${{ vars[format('AWS_ACCESS_KEY_ID_{0}', needs.prepare.outputs.deploy-env)] }}
+                aws-secret-access-key: ${{ secrets[format('AWS_SECRET_ACCESS_KEY_{0}', needs.prepare.outputs.deploy-env)] }}
+                aws-region: 'us-west-2'
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Bootstrap CDK
+              working-directory: ./
+              run: npx cdk bootstrap
+
+            - name: Deploy
+              working-directory: ./
+              run: |
+                npx cdk deploy \
+                  --parameters RabbitMQHost=${{ vars.RABBITMQ_HOST }} \
+                  --parameters RabbitMQPort=${{ vars.RABBITMQ_PORT }} \
+                  --parameters RabbitMQUser=${{ vars.RABBITMQ_USER }} \
+                  --parameters RabbitMQPass=${{ secrets.RABBITMQ_PASS }} \
+                  --parameters SourceAccountId=${{ vars.SOURCE_ACCOUNT_ID }} \
+                  --parameters RemoteRoleName=${{ vars.REMOTE_ROLE_NAME }} \
+                  --parameters Auth0Audience=${{ vars.AUTH0_AUDIENCE }} \
+                  --parameters Auth0Issuer=${{ vars.AUTH0_ISSUER }} \
+                  --parameters Auth0JwksUri=${{ vars.AUTH0_JWKS_URI }} \
+                  --require-approval never
