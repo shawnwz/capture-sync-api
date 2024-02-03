@@ -1,7 +1,8 @@
 export type RMQMsg = {
-    s3_url: string;
-    guest_id:string;
+    s3Url: string;
+    guestId:string;
     token: string;
     location: string;
-    hardware_id: string;
+    hardwareId: string;
+    tags: string[];
 }

@@ -31,21 +31,11 @@ export const getSignedUrl = async function (bucket: string, key:string) {
     // let s3: S3
     // s3 = new S3(credentials)
 
-
-    // console.log("access id is ", credentials.accessKeyId);
-    // console.log("access secret is ", credentials.secretAccessKey);
-
     let s3: S3;
     s3 = new S3({
         accessKeyId: process.env.AWS_ACCESS_KEY,
         secretAccessKey: process.env.AWS_SECRET_KEY,
     })
-    // return s3.getSignedUrlPromise('getObject', {
-    //     Bucket: bucket,
-    //     Key: key,
-    //     ContentType: 'image/jpg',
-    //     Expires: 3600
-    // })
 
     return s3.getSignedUrl('getObject', {
         Bucket: bucket,

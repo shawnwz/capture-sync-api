@@ -47,11 +47,12 @@ export const handler: Handler = async (event:APIGatewayEvent) => {
         logger.info("signed url is : ", signedUrl);
 
         let messageBody:RMQMsg = {
-            s3_url: signedUrl,
-            guest_id: token,
+            s3Url: signedUrl,
+            guestId: token,
             token: token,
             location: location,
-            hardware_id: hardware_id
+            hardwareId: hardware_id,
+            tags: [],
         }
 
         const sslOptions = {
