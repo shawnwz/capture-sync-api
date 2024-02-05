@@ -85,10 +85,11 @@ export const handler: Handler = async (event:APIGatewayEvent) => {
         })
         // Declare the queue
         //await channel.assertQueue(queueName, { durable: false });
-        logger.info("message body is ", JSON.stringify(messageBody));
+        //logger.info("message body is ", JSON.stringify(messageBody));
+        //logger.info("message opts is ", JSON.stringify(opts));
         // Send a message to the queue
-        await channel.publish(exchange_name, queue_name, Buffer.from(JSON.stringify(messageBody)), opts);
-    
+        channel.publish(exchange_name, queue_name, Buffer.from(JSON.stringify(messageBody)), opts);
+        logger.info(`[x] Published message "${messageBody}" to <${exchange_name} : ${JSON.stringify(opts)}>`);
         // Close the channel and connection
         await channel.close();
         await connection.close();
