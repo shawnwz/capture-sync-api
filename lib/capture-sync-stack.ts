@@ -166,8 +166,17 @@ export class CaptureSyncStack extends cdk.Stack {
     api.root.resourceForPath("sync").addMethod("POST", new apigw.LambdaIntegration(captureSyncLambda), {
       operationName: 'post captured content',
       apiKeyRequired: false,
-      authorizer: authorizer,
-      authorizationType: apigw.AuthorizationType.CUSTOM,
+      //authorizer: authorizer,
+      //authorizationType: apigw.AuthorizationType.CUSTOM,
+      //requestValidator: bodyValidator,
+      //requestModels: {'multipart/form-data': model},
+    });
+
+    api.root.resourceForPath("sync/file-manager/upload").addMethod("POST", new apigw.LambdaIntegration(captureSyncLambda), {
+      operationName: 'post captured content',
+      apiKeyRequired: false,
+      //authorizer: authorizer,
+      //authorizationType: apigw.AuthorizationType.CUSTOM,
       //requestValidator: bodyValidator,
       //requestModels: {'multipart/form-data': model},
     });
