@@ -26,7 +26,7 @@ export const getSignedUrl = async function (bucket: string, key:string) {
     logger.info("getting signed url...")
     // const credentials = await getCredentials({
     //     sourceAccount: process.env.SOURCE_ACCOUNT!,
-    //     remoteRoleName: process.env.REMOTEROLE_NAME!,
+    //     remoteRoleName: process.env.REMOTE_ROLE_NAME!,
     // });
     // let s3: S3
     // s3 = new S3(credentials)

@@ -59,7 +59,7 @@ export class CaptureSyncStack extends cdk.Stack {
 
     const bucket = new cdk.aws_s3.Bucket(this, "cloud-capture-sync-api", {
       //bucketName: "cloud-capture-sync-api",
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
     //The lambda function used to verify jwt token
@@ -102,7 +102,7 @@ export class CaptureSyncStack extends cdk.Stack {
          RABBITMQ_USER: rabbitMQUser,
          RABBITMQ_PASS: rabbitMQPass,
          SOURCE_ACCOUNT: sourceAccount,
-         REMOTEROLE_NAME: remoteRoleName,
+         REMOTE_ROLE_NAME: remoteRoleName,
          NODE_EXTRA_CA_CERTS: "ca.cert.pem"
        }
     });
@@ -128,11 +128,6 @@ export class CaptureSyncStack extends cdk.Stack {
       binaryMediaTypes: ['*/*'],
     });
 
-    // const myValidator = api.addRequestValidator("validate-request", {
-    //   requestValidatorName: "my-request-validator",
-    //   validateRequestBody: true,
-    //   validateRequestParameters: false,
-    // });
     const createValidator = (input: IValidators) => new apigw.RequestValidator(
       this,
       input.requestValidatorName,
@@ -174,7 +169,7 @@ export class CaptureSyncStack extends cdk.Stack {
       authorizer: authorizer,
       authorizationType: apigw.AuthorizationType.CUSTOM,
       //requestValidator: bodyValidator,
-      //requestModels: {'application/json': requestBodySchema},
+      //requestModels: {'multipart/form-data': model},
     });
 
     new cdk.CfnOutput(this, "Lambda Function ARN", {value: captureSyncLambda.functionArn})

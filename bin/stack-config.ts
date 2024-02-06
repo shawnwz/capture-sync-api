@@ -14,7 +14,7 @@ const environmentConfig: ICaptureSyncApiGatewayStackProps = {
   api: {
     name: 'capture-sync-rest-api',
     desc: 'Rest Api Gateway for capture sync',
-    modelName: 'DemoModel',
+    modelName: 'CaptureSyncModel',
     rootResource: 'v1',
   },
 //   usageplan: {
