@@ -140,11 +140,11 @@ export class CaptureSyncStack extends cdk.Stack {
     );
 
     //gateway authorizer
-    const authorizer = new apigw.TokenAuthorizer(this, "auth0Authorizer", {
-      handler: authLambda,
-      identitySource : apigw.IdentitySource.header("Authorization"),
-      resultsCacheTtl: Duration.seconds(0),
-    });
+    // const authorizer = new apigw.TokenAuthorizer(this, "auth0Authorizer", {
+    //   handler: authLambda,
+    //   identitySource : apigw.IdentitySource.header("Authorization"),
+    //   resultsCacheTtl: Duration.seconds(0),
+    // });
 
 
     const bodyValidator = createValidator(props.validators.bodyValidator);
